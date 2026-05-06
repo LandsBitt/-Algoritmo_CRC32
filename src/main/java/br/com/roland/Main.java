@@ -3,68 +3,51 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.zip.CRC32;
 
 public class Main {
+    // legenda: nm = nome, id = idade, tl = telefone, ms = mensagem, cs = crc32
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-        //Coleta os dados
-        System.out.print("Qual o seu nome? ");
-        String nome = scanner.nextLine();
+        System.out.print("qual seu nome? ");
+        String nm = sc.nextLine();
 
-        System.out.print("Qual a sua idade? ");
-        String idade = scanner.nextLine();
+        System.out.print("qual sua idade? ");
+        String id = sc.nextLine();
 
-        System.out.print("Qual o seu telefone? ");
-        String telefone = scanner.nextLine();
+        System.out.print("qual seu telefone? ");
+        String tl = sc.nextLine();
 
-        scanner.close();
+        sc.close();
 
-        // Monta a mensagem
-        // Todos os campos juntos em uma única string separada por vírgula
-        String mensagem = nome + "," + idade + "," + telefone;
+        String ms = nm + "," + id + "," + tl;
+        long cs = calcularCRC32(ms);
 
-        // Calcula o CRC32
-        long checksum = calcularCRC32(mensagem);
+        System.out.println("dados enviados:");
+        System.out.println("mensagem : " + ms);
+        System.out.println("crc32    : " + cs);
 
-        // Exibe o que será enviado
-        System.out.println("DADOS PRONTOS PARA ENVIO:");
-        System.out.println("  Mensagem : " + mensagem);
-        System.out.println("  CRC32    : " + checksum);
-        System.out.println("----------------------------------------");
-
-        // Grava no arquivo (simula o envio)
         try {
-            enviarParaArquivo(mensagem, checksum);
-            System.out.println("Dados enviados com sucesso! (arquivo: dados_enviados.txt)");
-            System.out.println("Execute Receiver.java para verificar.");
+            enviarParaArquivo(ms, cs);
+            System.out.println("arquivo salvo: dados_enviados.txt");
         } catch (IOException e) {
-            System.out.println("Erro ao enviar: " + e.getMessage());
+            System.out.println("erro ao enviar: " + e.getMessage());
         }
     }
 
-    /**
-     * Calcula o checksum CRC32 de uma String.
-     * CRC32 transforma qualquer texto em um número de 32 bits.
-     * Se o texto mudar, o número muda completamente.
-     */
-    private static long calcularCRC32(String texto) {
-        ; // alimenta os bytes do texto
-        return        // retorna o número calculado
+    // calcula o crc32 da mensagem
+    private static long calcularCRC32(String tx) {
+        return CacularCRC32.calcular(tx);
     }
 
-    /**
-     * Grava a mensagem e o checksum em um arquivo de texto.
-     * Usa BufferedWriter (IO) para escrita eficiente.
-     */
-    private static void enviarParaArquivo(String mensagem, long checksum) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("dados_enviados.txt"));
-        writer.write(mensagem);  // linha 1: a mensagem
-        writer.newLine();
-        writer.write(String.valueOf(checksum)); // linha 2: o checksum
-        writer.close();
+    // salva a mensagem e o crc32 no arquivo
+    private static void enviarParaArquivo(String ms, long cs) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter("dados_enviados.txt"));
+        bw.write(ms);  // linha 1: mensagem
+        bw.newLine();
+        bw.write(String.valueOf(cs)); // linha 2: crc32
+        bw.close();
     }
 }
